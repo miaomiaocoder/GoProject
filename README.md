@@ -7,3 +7,6 @@
 ## [GoByExample](GoByExample)项目参考学习了网上[Go by Example 中文版](https://gobyexample-cn.github.io/)
 
 * 通过编写测试学习 Go 语言
+
+## [GoRedis](go-redis)项目参考学习了HDT3213D的[godis](https://github.com/HDT3213/godis)
+* 用Go语言重写Redis中间件
