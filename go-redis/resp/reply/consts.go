@@ -5,7 +5,7 @@ type PongRelply struct {
 
 var pongBytes = []byte("+PONG\r\n")
 
-func (r PongRelply) ToBytes() []byte {
+func (r *PongRelply) ToBytes() []byte {
 	return pongBytes
 }
 
@@ -31,7 +31,7 @@ type NullBulkReply struct{}
 
 var nullBulkBytes = []byte("$-1\r\n")
 
-func (n NullBulkReply) ToBytes() []byte {
+func (n *NullBulkReply) ToBytes() []byte {
 	return nullBulkBytes
 }
 
@@ -51,6 +51,6 @@ type NoReply struct{}
 
 var noBytes = []byte("")
 
-func (n NoReply) ToBytes() []byte {
+func (n *NoReply) ToBytes() []byte {
 	return noBytes
 }
