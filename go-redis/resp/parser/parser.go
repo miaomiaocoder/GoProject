@@ -111,7 +111,7 @@ func parse0(reader io.Reader, ch chan<- *Payload) {
 				continue
 			}
 		} else {
-			err := readBody(msg, &state)
+			err = readBody(msg, &state)
 			if err != nil {
 				ch <- &Payload{
 					Err: errors.New("protocol error:" + string(msg)),

@@ -36,7 +36,7 @@ func (r *MultiBulkReply) ToBytes() []byte {
 	buf.WriteString("*" + strconv.Itoa(argLen) + CRLF)
 	for _, arg := range r.Args {
 		if arg == nil {
-			buf.WriteString(string(nullBulkReplyBytes) + CRLF)
+			buf.WriteString("$-1" + CRLF)
 		} else {
 			buf.WriteString("$" + strconv.Itoa(len(arg)) + CRLF + string(arg) + CRLF)
 		}

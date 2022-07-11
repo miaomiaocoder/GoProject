@@ -21,7 +21,7 @@
             - [wait.go](lib/sync/wait/wait.go) 对WaitGroup封装
 * resp
     * parser
-        - [parser.go](resp/parser/parser.go)
+        - [parser.go](resp/parser/parser.go) resp协议解析器实现
     * reply
         - [consts.go](resp/reply/consts.go)
         - [error.go](resp/reply/error.go)
