@@ -20,8 +20,12 @@
         * wait
             - [wait.go](lib/sync/wait/wait.go) 对WaitGroup封装
 * resp
+    * parser
+        - [parser.go](resp/parser/parser.go)
     * reply
         - [consts.go](resp/reply/consts.go)
+        - [error.go](resp/reply/error.go)
+        - [reply.go](resp/reply/reply.go)
 * tcp tcp服务器实现
     - [echo.go](tcp/echo.go) 一个简单的 Echo 服务器，它会接受客户端连接并将客户端发送的内容原样传回客户端
     - [server.go](tcp/server.go) 可优雅关闭的服务器

@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"errors"
 	"go-redis/interface/resp"
+	"go-redis/lib/logger"
 	"go-redis/resp/reply"
 	"io"
+	"runtime/debug"
 	"strconv"
 	"strings"
 )
@@ -27,6 +29,8 @@ func (s *readState) finished() bool {
 	return s.expectedArgsCount > 0 && len(s.args) == s.expectedArgsCount
 }
 
+// ParseStream 通过 io.Reader 读取数据并将结果通过 channel 将结果返回给调用者
+// 流式处理的接口适合供客户端/服务端使用
 func ParseStream(reader io.Reader) <-chan *Payload {
 	ch := make(chan *Payload)
 	go parse0(reader, ch)
@@ -34,7 +38,102 @@ func ParseStream(reader io.Reader) <-chan *Payload {
 }
 
 func parse0(reader io.Reader, ch chan<- *Payload) {
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Error(string(debug.Stack()))
+		}
+	}()
+	bufReader := bufio.NewReader(reader)
+	var state readState
+	var err error
+	var msg []byte
+	for {
+		var ioErr bool
+		msg, ioErr, err = readLine(bufReader, &state)
+		if err != nil {
+			if ioErr {
+				ch <- &Payload{
+					Err: err,
+				}
+				close(ch)
+				return
+			}
+			ch <- &Payload{
+				Err: err,
+			}
+			state = readState{}
+			continue
+		}
 
+		// 单行: StatusReply, IntReply, ErrorReply
+		// 多行: BulkReply, MultiBulkReply
+		// 判断是不是多行解析模式
+		if !state.readingMultiLine {
+			if msg[0] == '*' { // *3\r\n
+				err = parseMultiBulkHeader(msg, &state)
+				if err != nil {
+					ch <- &Payload{
+						Err: errors.New("protocol error:" + string(msg)),
+					}
+					state = readState{}
+					continue
+				}
+				if state.expectedArgsCount == 0 {
+					ch <- &Payload{
+						Data: &reply.EmptyMultiBulkReply{},
+					}
+					state = readState{}
+					continue
+				}
+			} else if msg[0] == '$' { // $4\r\nPING\r\n or $-1\r\n
+				err = parseBulkHeader(msg, &state)
+				if err != nil {
+					ch <- &Payload{
+						Err: errors.New("protocol error:" + string(msg)),
+					}
+					state = readState{}
+					continue
+				}
+				if state.bulkLen == -1 {
+					ch <- &Payload{
+						Data: &reply.EmptyMultiBulkReply{},
+					}
+					state = readState{}
+					continue
+				}
+			} else {
+				result, err := parseSingleLineReply(msg)
+				ch <- &Payload{
+					Data: result,
+					Err:  err,
+				}
+				state = readState{}
+				continue
+			}
+		} else {
+			err := readBody(msg, &state)
+			if err != nil {
+				ch <- &Payload{
+					Err: errors.New("protocol error:" + string(msg)),
+				}
+				state = readState{}
+				continue
+			}
+			if state.finished() {
+				var result resp.Reply
+				if state.msgType == '*' {
+					result = reply.MakeMultiBulkReply(state.args)
+				} else if state.msgType == '$' {
+					result = reply.MakeBulkReply(state.args[0])
+				}
+				ch <- &Payload{
+					Data: result,
+					Err:  err,
+				}
+				state = readState{}
+			}
+		}
+	}
 }
 
 // *3\r\n$3\r\nSET\r\n$3\r\nkey\r\n$5\r\nvalue\r\n
