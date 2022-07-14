@@ -33,8 +33,9 @@ func NewDatabase() *Database {
 		}
 		database.aofHandler = aofHandler
 		for _, db := range database.dbSet {
-			db.addAof = func(line CmdLine) {
-				database.aofHandler.AddAof(db.index, line)
+			sdb := db
+			sdb.addAof = func(line CmdLine) {
+				database.aofHandler.AddAof(sdb.index, line)
 			}
 		}
 	}
