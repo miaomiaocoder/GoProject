@@ -72,3 +72,4 @@ go-redis 是一个用 Go 语言实现的 Redis 服务器。
 * [main.go](main.go) 主程序
 * [redis.conf](redis.conf) redis配置文件
 * [appendonly.aof](appendonly.aof)
+* [note.md](note.md) 项目笔记
