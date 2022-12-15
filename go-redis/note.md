@@ -28,7 +28,8 @@ TCP 服务器的优雅关闭模式通常为: 先关闭listener阻止新连接进
 
 RESP 是一个二进制安全的文本协议，工作于 TCP 协议上。RESP 以行作为单位，客户端和服务器发送的命令或数据一律以 \r\n （CRLF）作为换行符。
 
-![resp格式](pic\1.png)
+![resp格式](pic/1.png)
+
 
 ### 内存数据库
 
@@ -66,9 +67,9 @@ AOF 持久化是典型的异步任务，主协程(goroutine) 可以使用 channe
 
 ### Redis集群 
 
-![一致性哈希](pic\hash.png)
+![一致性哈希](pic/hash.png)
 
-![resp格式](pic\cluster.png)
+![resp格式](pic/cluster.png)
 
 
 ## 参考文献
