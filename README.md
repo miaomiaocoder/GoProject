@@ -10,3 +10,6 @@
 
 ## [GoRedis](go-redis)项目参考学习了HDT3213的[godis](https://github.com/HDT3213/godis)
 * 用Go语言重写Redis中间件
+
+## [goConcurrentCode](goConcurrentCode)
+* 极客时间的 Go 并发编程实战课
